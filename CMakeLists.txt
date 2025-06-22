@@ -26,6 +26,27 @@ else()
     set(UFMT_WARNINGS -Wall -Wextra)
 endif()
 
+# Enable comprehensive warning flags to match Windows behavior
+if(MSVC)
+    # Windows (MSVC) - Enable most warnings including conversion warnings
+    add_compile_options(/W4 /WX- /wd4996)
+else()
+    # Linux/GCC or Clang - Enable comprehensive warnings including conversion warnings
+    add_compile_options(
+        -Wall                    # Enable most warnings
+        -Wextra                  # Enable extra warnings
+        -Wconversion             # Warn about type conversions that may alter values
+        -Wsign-conversion        # Warn about sign conversions
+        -Wfloat-conversion       # Warn about float conversions
+        -Wcast-qual              # Warn about casts that remove qualifiers
+        -Wcast-align             # Warn about casts that increase alignment requirements
+        -Wshadow                 # Warn about variable shadowing
+        -Wpedantic               # Warn about non-standard C++
+        -Wunused                 # Warn about unused variables/functions
+        -Wuninitialized          # Warn about uninitialized variables
+    )
+endif()
+
 # Test executable
 add_executable(test_ufmt tests/test_ufmt.cpp)
 target_link_libraries(test_ufmt ufmt)
