@@ -424,7 +424,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Inspired by the formatting capabilities of [dlog.h](tmp/dlog/)
 - Design influenced by modern formatting libraries while maintaining C++11 compatibility
 - Test framework uses the lightweight [utest.h](include/utest/)
 - Optional integration with [ustr.h](include/ustr/) for universal type conversion
