@@ -46,7 +46,7 @@ public:
     double stop_ms() {
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time);
-        return duration.count() / 1000000.0; // Convert to milliseconds
+        return static_cast<double>(duration.count()) / 1000000.0; // Convert to milliseconds
     }
 };
 
@@ -58,14 +58,14 @@ BenchmarkStats calculate_stats(const std::vector<double>& times) {
     
     stats.min_ms = *std::min_element(times.begin(), times.end());
     stats.max_ms = *std::max_element(times.begin(), times.end());
-    stats.avg_ms = std::accumulate(times.begin(), times.end(), 0.0) / times.size();
+    stats.avg_ms = std::accumulate(times.begin(), times.end(), 0.0) / static_cast<double>(times.size());
     
     // Calculate standard deviation
     double variance = 0.0;
     for (double time : times) {
         variance += (time - stats.avg_ms) * (time - stats.avg_ms);
     }
-    variance /= times.size();
+    variance /= static_cast<double>(times.size());
     stats.stddev_ms = std::sqrt(variance);
     
     return stats;

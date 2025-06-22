@@ -29,7 +29,7 @@
 // Custom class to demonstrate ustr integration
 struct Point {
     double x, y;
-    Point(double x, double y) : x(x), y(y) {}
+    Point(double x_, double y_) : x(x_), y(y_) {}
 };
 
 namespace ufmt {
@@ -110,9 +110,9 @@ int main() {
     std::cout << "   " << message << std::endl;
     
     // Custom formatter for Points in context
-    ctx->set_formatter<Point>([](const Point& p) {
+    ctx->set_formatter<Point>([](const Point& pt) {
         char buf[64];
-        snprintf(buf, sizeof(buf), "[%f,%f]", p.x, p.y);
+        snprintf(buf, sizeof(buf), "[%f,%f]", pt.x, pt.y);
         return std::string(buf);
     });
     std::cout << "   " << ctx->format("Point with custom formatter: {0}", p) << std::endl;

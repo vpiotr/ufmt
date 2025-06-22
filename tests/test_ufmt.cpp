@@ -193,7 +193,7 @@ UTEST_FUNC_DEF(EdgeCases) {
 // Custom type test
 struct Point {
     int x, y;
-    Point(int x, int y) : x(x), y(y) {}
+    Point(int x_, int y_) : x(x_), y(y_) {}
 };
 
 // Extend ufmt::to_string for custom type

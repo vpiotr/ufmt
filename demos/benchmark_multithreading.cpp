@@ -40,14 +40,14 @@ BenchmarkStats calculate_stats(const std::vector<double>& values) {
     
     stats.min_ops = *std::min_element(values.begin(), values.end());
     stats.max_ops = *std::max_element(values.begin(), values.end());
-    stats.avg_ops = std::accumulate(values.begin(), values.end(), 0.0) / values.size();
+    stats.avg_ops = std::accumulate(values.begin(), values.end(), 0.0) / static_cast<double>(values.size());
     
     // Calculate standard deviation
     double variance = 0.0;
     for (double val : values) {
         variance += (val - stats.avg_ops) * (val - stats.avg_ops);
     }
-    variance /= values.size();
+    variance /= static_cast<double>(values.size());
     stats.stddev_ops = std::sqrt(variance);
     
     return stats;
@@ -65,8 +65,8 @@ void benchmark_worker(int thread_id, std::atomic<bool>& running, std::atomic<lon
         // Mix of different formatting operations to simulate real usage
         volatile auto result1 = ufmt::format("Simple: {0} {1}", thread_id, local_ops);
         volatile auto result2 = ctx->format("Named: Thread {thread_id}, Op {0}", local_ops);
-        volatile auto result3 = ufmt::format("Numeric: {0:.3f} {1:x}", local_ops * 0.001, local_ops);
-        volatile auto result4 = ctx->format("Complex: T{thread_id} #{0} Score:{1:.2f}", local_ops, local_ops * 0.01);
+        volatile auto result3 = ufmt::format("Numeric: {0:.3f} {1:x}", static_cast<double>(local_ops) * 0.001, local_ops);
+        volatile auto result4 = ctx->format("Complex: T{thread_id} #{0} Score:{1:.2f}", local_ops, static_cast<double>(local_ops) * 0.01);
         
         local_ops += 4;
         
@@ -129,14 +129,14 @@ ThreadBenchmarkResult run_local_context_benchmark(int num_threads, int duration_
     }
     
     auto actual_duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-    double duration_sec = actual_duration.count() / 1000000.0;
+    double duration_sec = static_cast<double>(actual_duration.count()) / 1000000.0;
     
     ThreadBenchmarkResult result;
     result.thread_count = num_threads;
     result.total_operations = operations_counter.load();
     result.duration_seconds = duration_sec;
-    result.ops_per_second = result.total_operations / duration_sec;
-    result.avg_latency_us = (duration_sec * 1000000.0) / result.total_operations;
+    result.ops_per_second = static_cast<double>(result.total_operations) / duration_sec;
+    result.avg_latency_us = (duration_sec * 1000000.0) / static_cast<double>(result.total_operations);
     
     return result;
 }
@@ -171,14 +171,14 @@ ThreadBenchmarkResult run_shared_context_benchmark(int num_threads, int duration
     }
     
     auto actual_duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-    double duration_sec = actual_duration.count() / 1000000.0;
+    double duration_sec = static_cast<double>(actual_duration.count()) / 1000000.0;
     
     ThreadBenchmarkResult result;
     result.thread_count = num_threads;
     result.total_operations = operations_counter.load();
     result.duration_seconds = duration_sec;
-    result.ops_per_second = result.total_operations / duration_sec;
-    result.avg_latency_us = (duration_sec * 1000000.0) / result.total_operations;
+    result.ops_per_second = static_cast<double>(result.total_operations) / duration_sec;
+    result.avg_latency_us = (duration_sec * 1000000.0) / static_cast<double>(result.total_operations);
     
     return result;
 }
@@ -196,7 +196,7 @@ int main() {
     std::cout << ", HW: " << std::thread::hardware_concurrency() << std::endl << std::endl;
     
     // Warmup
-    auto warmup_result = run_local_context_benchmark(2, WARMUP_SECONDS);
+    run_local_context_benchmark(2, WARMUP_SECONDS);
     
     // Benchmark 1: Local Context Performance
     std::vector<ThreadBenchmarkResult> local_results;

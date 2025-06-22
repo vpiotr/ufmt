@@ -429,10 +429,10 @@ inline std::string apply_string_formatting(const std::string& value, const std::
     if (maxLen > 0 && static_cast<int>(value.length()) > maxLen) {
         if (maxLen <= 3) {
             // For very short precision, just take first N characters without ellipsis
-            processedValue = value.substr(0, maxLen);
+            processedValue = value.substr(0, static_cast<std::string::size_type>(maxLen));
         } else {
             // For longer precision, truncate and add ellipsis
-            processedValue = value.substr(0, maxLen - 3) + "...";
+            processedValue = value.substr(0, static_cast<std::string::size_type>(maxLen - 3)) + "...";
         }
     }
     
@@ -727,9 +727,9 @@ private:
     template<typename T>
     std::string to_string(const T& value) const {
         // Check if custom formatter exists
-        std::type_index type(typeid(T));
-        if (has_formatter_impl(type)) {
-            return format_value_custom(type, &value, "");
+        std::type_index type_idx(typeid(T));
+        if (has_formatter_impl(type_idx)) {
+            return format_value_custom(type_idx, &value, "");
         }
         
         // Use default conversion
@@ -829,27 +829,24 @@ private:
     
     template<typename T>
     void add_args_to_vector(std::vector<std::pair<std::string, std::function<std::string(const std::string&)>>>& vec, T&& arg) {
-        // Check if custom formatter exists
-        std::type_index type(typeid(T));
+        // Use a different name to avoid shadowing
+        std::type_index type_idx(typeid(T));
         std::string stringValue;
-        if (has_formatter_impl(type)) {
-            stringValue = format_value_custom(type, &arg, ""); // Use custom formatter for default string representation
+        if (has_formatter_impl(type_idx)) {
+            stringValue = format_value_custom(type_idx, &arg, ""); // Use custom formatter for default string representation
         } else {
             stringValue = to_string(arg);
         }
         
         // Create formatter function for this argument
         auto formatter = [this, arg](const std::string& formatSpec) -> std::string {
-            // Try custom formatter first
-            std::type_index type(typeid(T));
-            if (has_formatter_impl(type)) {
-                return format_value_custom(type, &arg, formatSpec);
+            // Use a different name to avoid shadowing
+            std::type_index type_idx_lambda(typeid(T));
+            if (has_formatter_impl(type_idx_lambda)) {
+                return format_value_custom(type_idx_lambda, &arg, formatSpec);
             }
-            
-            // Use default formatter
             return detail::format_value(arg, formatSpec);
         };
-        
         vec.emplace_back(stringValue, formatter);
     }
 
@@ -957,9 +954,9 @@ private:
     template<typename T>
     std::string to_string(const T& value) const {
         // Check if custom formatter exists
-        std::type_index type(typeid(T));
-        if (has_formatter_impl(type)) {
-            return format_value_custom(type, &value, "");
+        std::type_index type_idx(typeid(T));
+        if (has_formatter_impl(type_idx)) {
+            return format_value_custom(type_idx, &value, "");
         }
         
         // Use default conversion

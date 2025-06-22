@@ -33,7 +33,7 @@ int main() {
             // Worker sees: global app_name + thread-local overrides
             std::string final = ctx->format("Worker {worker_id}: {app_name} [{log_level}] - {worker_msg}");
             
-            worker_results[i] = initial + "\n   " + final;
+            worker_results[static_cast<size_t>(i)] = initial + "\n   " + final;
         });
     }
     
@@ -44,7 +44,7 @@ int main() {
     
     // Display worker results
     for (int i = 0; i < 3; ++i) {
-        std::cout << "   " << worker_results[i] << std::endl;
+        std::cout << "   " << worker_results[static_cast<size_t>(i)] << std::endl;
     }
     
     std::cout << "\n3. Main thread after workers complete:\n";

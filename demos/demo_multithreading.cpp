@@ -101,7 +101,7 @@ void performance_worker(int thread_id, std::atomic<long long>& total_operations)
         // Mix of different formatting operations
         volatile auto result1 = ufmt::format("Simple: {0} {1}", thread_id, operations);
         volatile auto result2 = ctx->format("Named: Thread {thread}, Op {0}", operations);
-        volatile auto result3 = ufmt::format("Numeric: {0:.3f}", operations * 0.001);
+        volatile auto result3 = ufmt::format("Numeric: {0:.3f}", static_cast<double>(operations) * 0.001);
         
         operations += 3;
         (void)result1; (void)result2; (void)result3; // Prevent optimization
@@ -192,7 +192,7 @@ int main() {
     auto perf_duration = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now() - start_time);
     
-    double ops_per_second = (double)total_operations.load() / (perf_duration.count() / 1000.0);
+    double ops_per_second = static_cast<double>(total_operations.load()) / (static_cast<double>(perf_duration.count()) / 1000.0);
     
     std::cout << "Performance test completed in " << perf_duration.count() << "ms" << std::endl;
     std::cout << "Total operations: " << total_operations.load() << std::endl;

@@ -103,8 +103,8 @@ UTEST_FUNC_DEF(ScopedContextIsolation) {
                 std::string result2 = ctx->format("Named: {thread_name} op {operation}");
                 
                 // Store results
-                thread_results[i].push_back(result1);
-                thread_results[i].push_back(result2);
+                thread_results[static_cast<size_t>(i)].push_back(result1);
+                thread_results[static_cast<size_t>(i)].push_back(result2);
             }
         });
     }
@@ -124,18 +124,18 @@ UTEST_FUNC_DEF(ScopedContextIsolation) {
     
     // Verify isolation - each thread should have its own results
     for (int i = 0; i < num_threads; ++i) {
-        UTEST_ASSERT_EQUALS(thread_results[i].size(), operations_per_thread * 2);
+        UTEST_ASSERT_EQUALS(thread_results[static_cast<size_t>(i)].size(), operations_per_thread * 2);
         
         // Check custom formatter results
         for (int j = 0; j < operations_per_thread; ++j) {
             std::string expected_prefix = "T" + std::to_string(i) + ":";
-            UTEST_ASSERT_STR_CONTAINS(thread_results[i][j * 2], expected_prefix);
+            UTEST_ASSERT_STR_CONTAINS(thread_results[static_cast<size_t>(i)][static_cast<size_t>(j * 2)], expected_prefix);
         }
         
         // Check named variable results
         std::string expected_thread_name = "Thread_" + std::to_string(i);
         for (int j = 0; j < operations_per_thread; ++j) {
-            UTEST_ASSERT_STR_CONTAINS(thread_results[i][j * 2 + 1], expected_thread_name);
+            UTEST_ASSERT_STR_CONTAINS(thread_results[static_cast<size_t>(i)][static_cast<size_t>(j * 2 + 1)], expected_thread_name);
         }
     }
 }
@@ -167,8 +167,8 @@ UTEST_FUNC_DEF(MultipleSharedContexts) {
                     std::string result = ctx->format("Context {context_name}: T{thread_id} Op{operation}");
                     
                     {
-                        std::lock_guard<std::mutex> lock(context_mutexes[ctx_id]);
-                        context_results[ctx_id].push_back(result);
+                        std::lock_guard<std::mutex> lock(context_mutexes[static_cast<size_t>(ctx_id)]);
+                        context_results[static_cast<size_t>(ctx_id)].push_back(result);
                     }
                 }
             });
@@ -182,11 +182,11 @@ UTEST_FUNC_DEF(MultipleSharedContexts) {
     
     // Verify each context got the expected number of results
     for (int ctx_id = 0; ctx_id < num_contexts; ++ctx_id) {
-        UTEST_ASSERT_EQUALS(context_results[ctx_id].size(), threads_per_context * operations_per_thread);
+        UTEST_ASSERT_EQUALS(context_results[static_cast<size_t>(ctx_id)].size(), threads_per_context * operations_per_thread);
         
         // Verify all results contain the correct context name
         std::string expected_context = "test_context_" + std::to_string(ctx_id);
-        for (const auto& result : context_results[ctx_id]) {
+        for (const auto& result : context_results[static_cast<size_t>(ctx_id)]) {
             UTEST_ASSERT_STR_CONTAINS(result, expected_context);
         }
     }
@@ -446,8 +446,8 @@ UTEST_FUNC_DEF(TransparentThreadLocalIsolation) {
                 // Test overridden shared variable (should use thread-local)
                 std::string result2 = shared_ctx->format("Shared override: {shared_var}");
                 
-                thread_results[i].push_back(result1);
-                thread_results[i].push_back(result2);
+                thread_results[static_cast<size_t>(i)].push_back(result1);
+                thread_results[static_cast<size_t>(i)].push_back(result2);
                 
                 // Small delay to encourage context switching
                 if (j % 5 == 0) {
@@ -472,18 +472,15 @@ UTEST_FUNC_DEF(TransparentThreadLocalIsolation) {
     
     // Verify results - each thread should have its own thread-local values
     for (int i = 0; i < num_threads; ++i) {
-        UTEST_ASSERT_EQUALS(thread_results[i].size(), operations_per_thread * 2);
-        
+        UTEST_ASSERT_EQUALS(thread_results[static_cast<size_t>(i)].size(), operations_per_thread * 2);
         std::string expected_thread_value = "thread_" + std::to_string(i) + "_value";
-        
         for (int j = 0; j < operations_per_thread; ++j) {
             // Check thread-specific variable
             std::string expected1 = "Thread specific: " + expected_thread_value;
-            UTEST_ASSERT_STR_EQUALS(thread_results[i][j * 2], expected1);
-            
+            UTEST_ASSERT_STR_EQUALS(thread_results[static_cast<size_t>(i)][static_cast<size_t>(j * 2)], expected1);
             // Check overridden shared variable
             std::string expected2 = "Shared override: " + expected_thread_value;
-            UTEST_ASSERT_STR_EQUALS(thread_results[i][j * 2 + 1], expected2);
+            UTEST_ASSERT_STR_EQUALS(thread_results[static_cast<size_t>(i)][static_cast<size_t>(j * 2 + 1)], expected2);
         }
     }
     
