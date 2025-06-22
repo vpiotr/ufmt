@@ -64,7 +64,9 @@ target_compile_options(demo_basic PRIVATE ${UFMT_WARNINGS})
 add_executable(demo_multithreading demos/demo_multithreading.cpp)
 target_link_libraries(demo_multithreading ufmt)
 target_compile_options(demo_multithreading PRIVATE ${UFMT_WARNINGS})
-target_link_libraries(demo_multithreading pthread)
+if(NOT MSVC)
+    target_link_libraries(demo_multithreading pthread)
+endif()
 
 # Benchmark executable
 add_executable(benchmark_basic demos/benchmark_basic.cpp)
@@ -75,13 +77,17 @@ target_compile_options(benchmark_basic PRIVATE ${UFMT_WARNINGS} -O2)
 add_executable(benchmark_multithreading demos/benchmark_multithreading.cpp)
 target_link_libraries(benchmark_multithreading ufmt)
 target_compile_options(benchmark_multithreading PRIVATE ${UFMT_WARNINGS} -O2)
-target_link_libraries(benchmark_multithreading pthread)
+if(NOT MSVC)
+    target_link_libraries(benchmark_multithreading pthread)
+endif()
 
 # Multi-threading tests
 add_executable(test_multithreading tests/test_multithreading.cpp)
 target_link_libraries(test_multithreading ufmt)
 target_compile_options(test_multithreading PRIVATE ${UFMT_WARNINGS})
-target_link_libraries(test_multithreading pthread)
+if(NOT MSVC)
+    target_link_libraries(test_multithreading pthread)
+endif()
 
 # Add multi-threading test to CTest
 add_test(NAME ufmt_multithreading_tests COMMAND test_multithreading)
@@ -151,7 +157,9 @@ install(FILES
 add_executable(demo_transparent_api demos/demo_transparent_api.cpp)
 target_link_libraries(demo_transparent_api ufmt)
 target_compile_options(demo_transparent_api PRIVATE ${UFMT_WARNINGS})
-target_link_libraries(demo_transparent_api pthread)
+if(NOT MSVC)
+    target_link_libraries(demo_transparent_api pthread)
+endif()
 
 # ustr integration demo executable (optional - requires ustr.h)
 add_executable(demo_ustr_integration demos/demo_ustr_integration.cpp)
