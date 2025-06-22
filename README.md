@@ -120,6 +120,17 @@ ufmt supports printf-style format specifications:
 ### Strings
 - `{0:10}` - Right-aligned, width 10: `     hello`
 - `{0:-10}` - Left-aligned, width 10: `hello     `
+- `{0:^10}` - Center-aligned, width 10: `  hello   `
+- `{0:.5}` - Truncate to 5 characters: `hello`
+- `{0:10.5}` - Right-aligned, width 10, truncate to 5: `     hello`
+- `{0:-10.5}` - Left-aligned, width 10, truncate to 5: `hello     `
+- `{0:^10.5}` - Center-aligned, width 10, truncate to 5: `  hello   `
+- `{0:.3}` - Truncate to 3 characters, ellipsis if >3: `hel` or `he...` (see below)
+
+**Truncation details:**
+- If `.precision` is specified for a string, the output is truncated to that length.
+- If the precision is greater than 3, the output is truncated and an ellipsis (`...`) is appended (e.g., `{0:.7}` for `"abcdefgh"` gives `"abcd..."`).
+- For precision ≤ 3, no ellipsis is added.
 
 ## Type Conversion and Bypass Rules
 

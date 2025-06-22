@@ -148,12 +148,29 @@ public:
 /**
  * @brief Parsed format specification for a placeholder
  * @ingroup formatting
+ *
+ * Format specification syntax (for placeholders in template strings):
+ *   [{alignment}]{width}[.{precision}]{type}
+ *
+ * - alignment: '-' (left), '^' (center), default (right)
+ * - width: minimum field width (pads with spaces if needed)
+ * - .precision: for strings, truncates to max length (adds ellipsis if >3); for numbers, sets decimal precision
+ * - type: 'f', 'd', 'x', etc. (printf-style type specifier)
+ *
+ * Examples:
+ *   {name:10}         // right-aligned, width 10
+ *   {name:-10}        // left-aligned, width 10
+ *   {name:^10}        // center-aligned, width 10
+ *   {msg:.8}          // truncate string to 8 chars (ellipsis if >3)
+ *   {val:08x}         // zero-padded, width 8, hex integer
+ *   {num:10.2f}       // right-aligned, width 10, 2 decimal float
+ *   {s:^12.5}         // center, width 12, truncate to 5 chars
  */
 struct FormatSpec {
     std::string name;           ///< Variable name or positional index
     std::string format_string;  ///< Format specification (e.g., ".2f", "08x")
     int width = 0;              ///< Field width
-    int precision = -1;         ///< Decimal precision
+    int precision = -1;         ///< Decimal precision or string truncation
     bool left_justify = false;  ///< Left justification flag
     char format_type = '\0';    ///< Format type (f, d, x, etc.)
     bool zero_pad = false;      ///< Zero padding flag
@@ -379,7 +396,23 @@ inline std::string format_integer_value(long long value, const std::string& form
 }
 
 /**
- * @brief Apply string formatting (width and justification)
+ * @brief Applies width, alignment, and truncation to a string value according to formatSpec.
+ *
+ * Format spec syntax: [alignment][width][.precision]
+ *   - alignment: '-' (left), '^' (center), default (right)
+ *   - width: minimum field width (pads with spaces)
+ *   - .precision: for strings, truncates to max length (ellipsis if >3)
+ *
+ * Examples:
+ *   {name:10}    // right-aligned, width 10
+ *   {name:-10}   // left-aligned, width 10
+ *   {name:^10}   // center-aligned, width 10
+ *   {msg:.8}     // truncate string to 8 chars
+ *   {s:^12.5}    // center, width 12, truncate to 5 chars
+ *
+ * @param value String value to format
+ * @param formatSpec Format specification string
+ * @return Formatted string
  */
 inline std::string apply_string_formatting(const std::string& value, const std::string& formatSpec) {
     if (formatSpec.empty()) {
@@ -672,6 +705,16 @@ std::string to_string(const T& value) {
 /**
  * @brief Base class for all formatting contexts - provides core formatting logic
  * @ingroup contexts
+ *
+ * The format() method supports the following format string features:
+ *   - Positional and named placeholders: {0}, {name}
+ *   - Alignment: '-' (left), '^' (center), default (right)
+ *   - Width: {name:10} (pads to width 10)
+ *   - Truncation: {name:.8} (truncate string to 8 chars, ellipsis if >3)
+ *   - Center alignment: {name:^10}
+ *   - Printf-style type specifiers: {val:08x}, {num:10.2f}
+ *
+ * See FormatSpec for details and examples.
  */
 class format_context_base {
 public:
@@ -682,6 +725,14 @@ public:
      * @param template_str Template string with placeholders
      * @param args Variadic arguments to substitute
      * @return Formatted string
+     *
+     * Supported format string features:
+     *   - Alignment: '-' (left), '^' (center), default (right)
+     *   - Width: {name:10}
+     *   - Truncation: {name:.8}
+     *   - Center alignment: {name:^10}
+     *   - Printf-style type specifiers: {val:08x}, {num:10.2f}
+     *   - See FormatSpec for more.
      */
     template<typename... Args>
     std::string format(const std::string& template_str, Args&&... args) {
@@ -1285,6 +1336,17 @@ inline internal_context& get_singleton_internal_context() {
  * @param template_str Template string with {0}, {1}, etc. placeholders
  * @param args Arguments to substitute
  * @return Formatted string
+ *
+ * Supported format string features:
+ *   - Alignment: '-' (left), '^' (center), default (right)
+ *   - Width: {name:10}
+ *   - Truncation: {name:.8}
+ *   - Center alignment: {name:^10}
+ *   - Printf-style type specifiers: {val:08x}, {num:10.2f}
+ *   - See FormatSpec for more.
+ *
+ * Examples:
+ *   ufmt::format("{name:^10.8}", "Piotr") // center, width 10, truncate to 8 chars
  */
 template<typename... Args>
 std::string format(const std::string& template_str, Args&&... args) {
