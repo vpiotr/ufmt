@@ -1,12 +1,11 @@
 # ufmt - Micro String Formatting Library
 
 [![Build Status](https://github.com/vpiotr/ufmt/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/vpiotr/ufmt/actions)
-
-A lightweight, header-only C++11 micro-library for string template formatting with support for custom formatters, named variables, and both local and shared contexts.
-
 [![C++11](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B11)
 [![Header Only](https://img.shields.io/badge/Header-Only-green.svg)](https://github.com/vpiotr/ufmt)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+A lightweight, header-only C++11 micro-library for string template formatting with support for custom formatters, named variables, and both local and shared contexts.
 
 ## Features
 
